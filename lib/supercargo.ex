@@ -6,7 +6,6 @@ defmodule Supercargo do
   """
   import Supercargo.Utils
 
-  alias Supercargo.API
   alias Supercargo.Parser
   alias Supercargo.Parser.Validator
 
@@ -21,16 +20,26 @@ defmodule Supercargo do
   end
 
   defmacro __before_compile__(env) do
-    %{
-      maplines: Module.get_attribute(env.module, :maplines),
-      extraction: Module.get_attribute(env.module, :extraction)
-    }
-    |> compile
+    [maplines] = 
+      Module.get_attribute(env.module, :maplines)
+      |> (&if(length(&1) > 0,
+            do: &1,
+            else: [{}]
+          )).()
+    
+    [extraction] = 
+      Module.get_attribute(env.module, :extraction)
+      |> (&if(length(&1) > 0,
+            do: &1,
+            else: [{}]
+          )).()
+
+    compile(maplines, extraction)
   end
 
-  defmacro extract(entry, source) do
-    quote bind_quoted: [entry: entry, source: source] do
-      @extraction {entry, source}
+  defmacro extract(entries, source) do
+    quote bind_quoted: [entries: entries, source: source] do
+      @extraction {entries, source}
     end
   end
 
@@ -40,10 +49,7 @@ defmodule Supercargo do
     end
   end
 
-  defp compile(%{maplines: maplines, extraction: extraction}) do
-    [{entry, source}] = extraction
-    [{sources, structure}] = maplines
-
+  defp compile({sources, structure}, extraction) do
     Validator.validate!(sources, structure)
     vast = Parser.parse(sources, structure)
 
@@ -52,32 +58,44 @@ defmodule Supercargo do
         Generator.run(token, sources)
       end
 
-    api_ast =
-      for source <- sources do
-        generate_extract_ast(Map.to_list(entry), source)
+    compiled_extract_ast =
+      if tuple_size(extraction) > 0 do
+        {entries, source} = extraction
+        
+        for source <- sources do
+          generate_compiled_extract_ast(entries, source)
+        end
       end
 
-    [api_ast, accessors_ast]
+    runtime_extract_ast =
+      for source <- sources do
+        generate_runtime_extract_ast(source)
+      end
+
+    [compiled_extract_ast, runtime_extract_ast, accessors_ast]
   end
 
-  defp generate_extract_ast(entry, source) do
+  defp generate_compiled_extract_ast(entries, source) do
+    entries = Macro.escape(entries)
+
     quote do
-      # Compile-time
       def extract(unquote(source)) do
-        Supercargo.extract(unquote(source), unquote(entry), [strict: false], __MODULE__)
+        Supercargo.extract(unquote(source), unquote(entries), [strict: false], __MODULE__)
       end
-
       def extract!(unquote(source)) do
-        Supercargo.extract(unquote(source), unquote(entry), [strict: true], __MODULE__)
+        Supercargo.extract(unquote(source), unquote(entries), [strict: true], __MODULE__)
+      end
+    end
+  end
+
+  defp generate_runtime_extract_ast(source) do
+    quote do
+      def extract(unquote(source), entry_or_entries) do
+        Supercargo.extract(unquote(source), entry_or_entries, [strict: false], __MODULE__)
       end
 
-      # Runtime
-      def extract(unquote(source), entry) do
-        Supercargo.extract(unquote(source), entry, [strict: false], __MODULE__)
-      end
-
-      def extract!(unquote(source), entry) do
-        Supercargo.extract(unquote(source), entry, [strict: true], __MODULE__)
+      def extract!(unquote(source), entry_or_entries) do
+        Supercargo.extract(unquote(source), entry_or_entries, [strict: true], __MODULE__)
       end
     end
   end
@@ -113,15 +131,36 @@ defmodule Supercargo do
   end
 
   @doc false
-  def extract(source, entry, strict?, context) do
+  def extract(source, entries = [_|_], strict?, context) do
     [strict: strict?] = strict?
 
+    Enum.map(entries, 
+      fn entry -> 
+        extract_entry(source, entry, strict?, context) 
+    end)
+  end
+
+  @doc false
+  def extract(source, entry = %{}, strict?, context) do
+    [strict: strict?] = strict?
+
+    extract_entry(source, entry, strict?, context) 
+  end
+
+  defp extract_entry(source, entry, strict?, context) do
     Enum.reduce(apply(context, source, []), [], fn
       x, acc ->
         case x do
-          {field, identifier, category, {type_constraint, value_constraint}} ->
-            {_, val} = find_by_field(entry, field)
+          {field, identifier, _category, {type_constraint, value_constraint}} ->
+            find_by_field(entry, field)
 
+            val = 
+              case find_by_field(entry, field) do
+                {_, val} -> val
+                # TD: error
+                nil -> nil
+              end
+            
             check_correct_type!(type_constraint, val)
 
             {regex_length, value_length} = lengths(value_constraint, val)
@@ -136,7 +175,7 @@ defmodule Supercargo do
               [{identifier, val} | acc]
             end
 
-          {field, identifier, category} ->
+          {field, identifier, _category} ->
             {_, val} = find_by_field(entry, field)
 
             [{identifier, val} | acc]
@@ -151,15 +190,15 @@ defmodule Supercargo do
     |> Enum.into(%{})
   end
 
-  defp find_by_field(entry, field) do
+  defp find_by_field(entries, field) do
     Enum.find(
-      entry,
+      entries,
       fn
-        {entry_field, _} when is_atom(entry_field) ->
-          String.to_atom(field) == entry_field
+        {entries_field, _} when is_atom(entries_field) ->
+          String.to_atom(field) == entries_field
 
-        {entry_field, _} when is_bitstring(entry_field) ->
-          field == entry_field
+        {entries_field, _} when is_bitstring(entries_field) ->
+          field == entries_field
       end
     )
   end
