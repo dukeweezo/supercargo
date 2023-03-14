@@ -8,7 +8,7 @@
 * Ideal for any middleware scenarios with one or more heterogeneous / unnormalized datasets from multiple data sources (text files, APIs, message brokers) 
 * Currently alpha - any suggestions, questions, so forth (written as issues) are welcome!
 
-Ever seen a dynamic-data API (looking at you, form builder services) providing a response of `{"Field1": "not", "Field2": "very", "Field3": "helpful"}`? Instead of wrangling unmatching fields together amongst procedural code, or building bulky intermediary normalization, **Supercargo** takes a lightweight, data-driven approach with a single *manifest* linking each field to corresponding field and data source. It currently supports an unlimited number of sources → one target.
+Instead of wrangling unmatching fields together amongst procedural code, or building bulky intermediary normalization, **Supercargo** takes a lightweight, data-driven approach with a single *manifest* linking each field to corresponding field and data source. It currently supports an unlimited number of sources → one target.
 
 ### Examples (will be changed)
 Assume we have the following data from an API & a CSV file:
