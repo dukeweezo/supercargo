@@ -95,7 +95,7 @@ end
   # or e.g. extract all entries at once
   #   e = Manifest.extract(:csv, all_entries)
   # and access them all with 
-  #   Manifest.csv(e)
+  #   e
 
 ```
 
