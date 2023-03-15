@@ -24,7 +24,7 @@ defmodule Supercargo do
       Module.get_attribute(env.module, :maplines)
       |> (&if(length(&1) > 0,
             do: &1,
-            else: [{}]
+            else: (raise Supercargo.UsageError, "A mapline must be defined in valid format in the manifest.")
           )).()
     
     [extraction] = 
@@ -157,8 +157,7 @@ defmodule Supercargo do
             val = 
               case find_by_field(entry, field) do
                 {_, val} -> val
-                # TD: error
-                nil -> nil
+                nil -> raise Supercargo.ExtractError, "Can't find a field corresponding to a field in `#{source}`. The mapline may not match the entry / entries."
               end
             
             check_correct_type!(type_constraint, val)
@@ -191,16 +190,13 @@ defmodule Supercargo do
   end
 
   defp find_by_field(entries, field) do
-    Enum.find(
-      entries,
-      fn
-        {entries_field, _} when is_atom(entries_field) ->
-          String.to_atom(field) == entries_field
+    Enum.find(entries, fn
+      {entries_field, _} when is_atom(entries_field) ->
+        String.to_atom(field) == entries_field
 
-        {entries_field, _} when is_bitstring(entries_field) ->
-          field == entries_field
-      end
-    )
+      {entries_field, _} when is_bitstring(entries_field) ->
+        field == entries_field
+    end)
   end
 
   defp check_correct_type!(type, value) do

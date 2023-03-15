@@ -4,6 +4,8 @@ defmodule SupercargoTest do
   alias TestHelper.Manifest, as: Manifest
   alias TestHelper.API, as: API
 
+
+
   describe "extract/1," do
     test "" do
 
@@ -151,7 +153,6 @@ defmodule SupercargoTest do
     |> Stream.map(fun)
     |> Enum.to_list()
   end
-
 end
 
 
