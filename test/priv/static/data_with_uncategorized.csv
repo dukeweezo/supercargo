@@ -1,0 +1,14 @@
+uncategorized,Field1,Field2,Field3
+1,barbarian,Barbarian,/api/classes/barbarian
+2,bard,Bard,/api/classes/bard
+3,cleric,Cleric,/api/classes/cleric
+4,druid,Druid,/api/classes/druid
+5,fighter,Fighter,/api/classes/fighter
+6,monk,Monk,/api/classes/monk
+7,paladin,Paladin,/api/classes/paladin
+8,ranger,Ranger,/api/classes/ranger
+9,rogue,Rogue,/api/classes/rogue
+10,thief,Thief,null
+11,sorcerer,Sorcerer,/api/classes/sorcerer
+12,warlock,Warlock,/api/classes/warlock
+13,wizard,Wizard,/api/classes/wizard

@@ -1,6 +1,6 @@
 defmodule Supercargo.Parser.Validator do
   import Supercargo.Guards
-  
+
   def validate!(sources, structure) do
     check_source(sources)
     check_field_or_category(structure)
