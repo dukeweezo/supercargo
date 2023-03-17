@@ -165,6 +165,7 @@ defmodule Supercargo do
     extract_entry(source, entry, strict?, context)
   end
 
+  # TD: raise reduce up a level, break up case with multiple functions / signatures
   defp extract_entry(source, entry, strict?, context) do
     Enum.reduce(apply(context, construct_atomized_name(["internal__", source]), []), [], fn
       x, acc ->

@@ -18,20 +18,6 @@ defmodule SupercargoTest do
 
       assert csv_results == %{id: "1"}
     end
-
-    test "check if in extraction" do
-      csv_fn = fn
-        {:ok, entry} ->
-          Manifest.extract(:csv, entry)
-        _ ->
-          %{}
-      end
-
-      csv_results = get_data_from_csv(csv_fn, "priv/static/data_with_uncategorized.csv")
-      #dbg(csv_results)
-
-      # assert uncat == %{"uncategorized" => :uncategorized}
-    end
   end
 
   describe "extract/1," do
