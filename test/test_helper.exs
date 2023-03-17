@@ -20,8 +20,10 @@ defmodule TestHelper.Manifest do
   @name {["name", "Field2"], [:name, :string, ~r/[a-zA-Z]+/]}
   @url {["url", "Field3"], [:_url, :string, ~r/[a-zA-Z\/]+/]}
 
-  register_mapline [:api, :csv], 
+  register_mapline(
+    [:api, :csv],
     %{
+      "uncategorized" => :id,
       :name => %{
         elem(@name, 0) => elem(@name, 1)
       },
@@ -30,7 +32,8 @@ defmodule TestHelper.Manifest do
         elem(@url, 0) => elem(@url, 1)
       }
     }
-  
+  )
+
   # Compiled data example
   csv =
     "priv/static/data.csv"
@@ -38,17 +41,18 @@ defmodule TestHelper.Manifest do
     |> File.stream!()
     |> CSV.decode(headers: true)
     |> Stream.map(fn
-        {:ok, entry} ->
-          entry
-        _ ->
-          %{}
-      end)
+      {:ok, entry} ->
+        entry
+
+      _ ->
+        %{}
+    end)
     |> Enum.to_list()
 
-  extract csv, :csv
+  extract(csv, :csv)
 end
 
-#defmodule TestHelper.BrokenManifest do use Supercargo end
+# defmodule TestHelper.BrokenManifest do use Supercargo end
 
 defmodule TestHelper.ManifestWithoutExtract do
   use Supercargo
@@ -57,7 +61,8 @@ defmodule TestHelper.ManifestWithoutExtract do
   @name {["name", "Field2"], [:name, :string, ~r/[a-zA-Z]+/]}
   @url {["url", "Field3"], [:_url, :string, ~r/[a-zA-Z\/]+/]}
 
-  register_mapline [:api, :csv], 
+  register_mapline(
+    [:api, :csv],
     %{
       :name => %{
         elem(@name, 0) => elem(@name, 1)
@@ -67,7 +72,5 @@ defmodule TestHelper.ManifestWithoutExtract do
         elem(@url, 0) => elem(@url, 1)
       }
     }
+  )
 end
-
-
-

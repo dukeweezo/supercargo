@@ -20,11 +20,13 @@ defimpl Generator, for: Category.Group do
   end
 
   def run(%{name: category_name, entries: entries}, sources) do
+    alias Supercargo.Internal
+
     for {source, index} <- Enum.with_index(sources) do
       values = narrow_fields_by_source_index_and_flatten(entries, index)
 
       [
-        Supercargo.Internal.generate_category_ast(%{
+        Internal.generate_category_ast(%{
           source: source,
           category: category_name,
           values: values

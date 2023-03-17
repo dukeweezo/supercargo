@@ -88,5 +88,4 @@ defmodule Supercargo.Parser do
       end
     )
   end
-
 end
