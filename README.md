@@ -4,11 +4,9 @@
 > n. (pl. -goes or -gos) a representative of the ship's owner on board a merchant ship, responsible for overseeing the cargo.
 * Elixir data-mapping library
 * Single-source and declarative
-* Application-level data integrity (sitting between static analysis and your ORM / database)
-* Ideal for any middleware scenarios with one or more heterogeneous / unnormalized datasets from multiple data sources (text files, APIs, message brokers) 
-* Currently alpha - any suggestions, questions, so forth (written as issues) are welcome!
+* * Currently alpha - any suggestions, questions, so forth (written as issues) are welcome!
 
-Instead of wrangling unmatching fields together amongst procedural code, or building bulky intermediary normalization, **Supercargo** takes a lightweight, data-driven approach with a single *manifest* linking each field to corresponding field and data source. It currently supports an unlimited number of sources → one target.
+**Supercargo** takes a lightweight, data-driven approach with a single *manifest* linking each field to corresponding field and data source. It currently supports an unlimited number of sources → one target.
 
 ### Examples (will be changed)
 Assume we have the following data:
