@@ -4,7 +4,7 @@
 > n. (pl. -goes or -gos) a representative of the ship's owner on board a merchant ship, responsible for overseeing the cargo.
 * Elixir data-mapping library
 * Single-source and declarative
-* * Currently alpha - any suggestions, questions, so forth (written as issues) are welcome!
+* Currently alpha - any suggestions, questions, so forth (written as issues) are welcome!
 
 **Supercargo** takes a lightweight, data-driven approach with a single *manifest* linking each field to corresponding field and data source. It currently supports an unlimited number of sources → one target.
 
